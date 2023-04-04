@@ -92,7 +92,7 @@ public class RSVP {
                 .add("id", this.getId())
                 .add("name", this.getName())
                 .add("email", this.getEmail())
-                .add("phone", this.getEmail())
+                .add("phone", this.getPhone())
                 .add("confirmationDate", this.getConfirmationDate().toString(DateTimeFormat.forPattern("dd-MM-yyyy")))
                 .add("comments", this.getComments())
                 .build();
@@ -116,7 +116,6 @@ public class RSVP {
             try (InputStream is = new ByteArrayInputStream(json.getBytes())) {
                 JsonReader jr = Json.createReader(is);
                 JsonObject jsObj = jr.readObject();
-                rsvp.setId(jsObj.getInt("id"));
                 rsvp.setName(jsObj.getString("name"));
                 rsvp.setEmail(jsObj.getString("email"));
                 rsvp.setPhone(jsObj.getString("phone"));

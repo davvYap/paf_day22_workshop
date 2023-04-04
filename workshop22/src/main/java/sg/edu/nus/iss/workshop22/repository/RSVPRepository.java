@@ -81,10 +81,20 @@ public class RSVPRepository {
             jdbcTemplate.update(UPDATE_EXISTING_RSVP,
                     rsvp.getName(),
                     rsvp.getPhone(),
-                    rsvp.getConfirmationDate(),
-                    rsvp.getComments());
+                    new Timestamp(rsvp.getConfirmationDate().toDateTime().getMillis()),
+                    rsvp.getComments(),
+                    rsvp.getEmail());
         }
 
         return newRsvp;
     }
+
+    // public RSVP updateRsvp(RSVP rsvp) {
+    // RSVP existingRsvp = getRSVPByEmail(rsvp.getEmail());
+    // jdbcTemplate.update(UPDATE_EXISTING_RSVP,
+    // rsvp.getName(),
+    // rsvp.getPhone(),
+    // rsvp.getConfirmationDate(),
+    // rsvp.getComments());
+    // }
 }

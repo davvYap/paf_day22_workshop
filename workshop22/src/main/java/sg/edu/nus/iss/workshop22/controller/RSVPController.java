@@ -72,14 +72,14 @@ public class RSVPController {
     @PostMapping(path = "/rsvp")
     public ResponseEntity<String> insertOrUpdateRSVP(@RequestBody String json) throws IOException {
         RSVP rsvp = RSVP.createFromJSON(json);
-        rsvpService.createRsvp(rsvp);
+        RSVP newRsvp = rsvpService.createRsvp(rsvp);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Json.createObjectBuilder()
                         .add("Message", "%s >>> %s is updated/inserted"
-                                .formatted(rsvp.getId(), rsvp.getName()))
+                                .formatted(newRsvp.getId(), newRsvp.getName()))
                         .build()
                         .toString());
     }
