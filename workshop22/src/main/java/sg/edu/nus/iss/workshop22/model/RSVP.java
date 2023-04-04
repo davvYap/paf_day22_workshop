@@ -120,7 +120,7 @@ public class RSVP {
                 rsvp.setName(jsObj.getString("name"));
                 rsvp.setEmail(jsObj.getString("email"));
                 rsvp.setPhone(jsObj.getString("phone"));
-                String date = jsObj.getString("confirmation_date");
+                String date = jsObj.getString("confirmationDate");
                 rsvp.setConfirmationDate(getDateTime(date));
                 rsvp.setComments(jsObj.getString("comments"));
             }
@@ -129,7 +129,7 @@ public class RSVP {
     }
 
     public static DateTime getDateTime(String date) {
-        DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("dd-MM-yyyy");
         DateTime dateTime = formatter.parseDateTime(date);
         return dateTime;
     }

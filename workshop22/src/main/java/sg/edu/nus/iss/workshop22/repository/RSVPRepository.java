@@ -45,7 +45,7 @@ public class RSVPRepository {
     }
 
     public RSVP getRSVPByEmail(String email) {
-        SqlRowSet rs = jdbcTemplate.queryForRowSet(email);
+        SqlRowSet rs = jdbcTemplate.queryForRowSet(SELECT_RSVP_BY_EMAIL, email);
         RSVP rsvp = null;
         if (rs.first()) {
             rsvp = RSVP.createFromResults(rs);
