@@ -79,22 +79,34 @@ public class RSVPRepository {
             newRsvp.setComments(rsvp.getComments());
 
             jdbcTemplate.update(UPDATE_EXISTING_RSVP,
-                    rsvp.getName(),
-                    rsvp.getPhone(),
+                    newRsvp.getName(),
+                    newRsvp.getPhone(),
                     new Timestamp(rsvp.getConfirmationDate().toDateTime().getMillis()),
-                    rsvp.getComments(),
-                    rsvp.getEmail());
+                    newRsvp.getComments(),
+                    newRsvp.getEmail());
+
+            rsvp.setId(newRsvp.getId());
         }
 
+        return rsvp;
+    }
+
+    public RSVP updateRsvp(RSVP rsvp) {
+        RSVP newRsvp = getRSVPByEmail(rsvp.getEmail());
+        if (newRsvp != null) {
+            newRsvp.setName(rsvp.getName());
+            newRsvp.setPhone(rsvp.getPhone());
+            newRsvp.setConfirmationDate(rsvp.getConfirmationDate());
+            newRsvp.setComments(rsvp.getComments());
+
+            jdbcTemplate.update(UPDATE_EXISTING_RSVP,
+                    newRsvp.getName(),
+                    newRsvp.getPhone(),
+                    new Timestamp(rsvp.getConfirmationDate().toDateTime().getMillis()),
+                    newRsvp.getComments(),
+                    newRsvp.getEmail());
+        }
         return newRsvp;
     }
 
-    // public RSVP updateRsvp(RSVP rsvp) {
-    // RSVP existingRsvp = getRSVPByEmail(rsvp.getEmail());
-    // jdbcTemplate.update(UPDATE_EXISTING_RSVP,
-    // rsvp.getName(),
-    // rsvp.getPhone(),
-    // rsvp.getConfirmationDate(),
-    // rsvp.getComments());
-    // }
 }

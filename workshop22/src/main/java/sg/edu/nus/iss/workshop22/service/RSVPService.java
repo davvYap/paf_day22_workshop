@@ -30,4 +30,9 @@ public class RSVPService {
     public RSVP createRsvp(RSVP rsvp) {
         return rsvpRepository.createRsvp(rsvp);
     }
+
+    public RSVP updateRsvp(RSVP updateRsvp) {
+        RSVP rsvp = rsvpRepository.updateRsvp(updateRsvp);
+        return rsvp;
+    }
 }
