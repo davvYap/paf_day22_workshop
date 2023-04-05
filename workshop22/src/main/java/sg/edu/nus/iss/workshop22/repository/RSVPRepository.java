@@ -6,6 +6,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -108,5 +109,19 @@ public class RSVPRepository {
         }
         return newRsvp;
     }
+
+    public Long getRsvpCount() {
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(SELECT_RSVP_COUNT);
+        return (Long) rows.get(0).get("total_count");
+    }
+
+    // public Long getRsvpCount() {
+    // SqlRowSet rs = jdbcTemplate.queryForRowSet(SELECT_RSVP_COUNT);
+    // Long count = 0L;
+    // while (rs.first()) {
+    // count = rs.getLong("total_count");
+    // }
+    // return count;
+    // }
 
 }

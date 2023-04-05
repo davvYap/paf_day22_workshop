@@ -35,4 +35,8 @@ public class RSVPService {
         RSVP rsvp = rsvpRepository.updateRsvp(updateRsvp);
         return rsvp;
     }
+
+    public Long getRsvpCount() {
+        return rsvpRepository.getRsvpCount();
+    }
 }

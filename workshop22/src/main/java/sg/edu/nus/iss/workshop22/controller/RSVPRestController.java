@@ -95,6 +95,28 @@ public class RSVPRestController {
                                                 .toString());
         }
 
+        // passing data using a form
+        @PostMapping(path = "/rsvp/form", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+        public ResponseEntity<String> insertOrUpdateRsvpForm(@ModelAttribute RSVP rsvp, @RequestParam String date) {
+                // to check whether is existing record
+                Boolean isExisting = rsvpService.getRSVPByEmail(rsvp.getEmail()) == null ? false : true;
+
+                System.out.println("Date from form >>>>>>>>>>>>>>>>>>>>>>>>>>> " + date);
+                rsvp.setConfirmationDate(RSVP.getDateTimeFromHtmlForm(date));
+                RSVP newRsvp = rsvpService.createRsvp(rsvp);
+
+                String message = isExisting ? "%s >>> %s is updated".formatted(newRsvp.getId(), newRsvp.getName())
+                                : "%s >>> %s is inserted".formatted(newRsvp.getId(), newRsvp.getName());
+
+                return ResponseEntity
+                                .status(HttpStatus.CREATED)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(Json.createObjectBuilder()
+                                                .add("Message", message)
+                                                .build()
+                                                .toString());
+        }
+
         @PutMapping(path = "/rsvp/{email}")
         public ResponseEntity<String> updateRsvpJSON(@PathVariable String email, @RequestBody String json)
                         throws IOException {
@@ -121,26 +143,14 @@ public class RSVPRestController {
                                                 .build().toString());
         }
 
-        // passing data using a form
-        @PostMapping(path = "/rsvp/form", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-        public ResponseEntity<String> insertOrUpdateRsvpForm(@ModelAttribute RSVP rsvp, @RequestParam String date) {
-                // to check whether is existing record
-                Boolean isExisting = rsvpService.getRSVPByEmail(rsvp.getEmail()) == null ? false : true;
-
-                System.out.println("Date from form >>>>>>>>>>>>>>>>>>>>>>>>>>> " + date);
-                rsvp.setConfirmationDate(RSVP.getDateTimeFromHtmlForm(date));
-                RSVP newRsvp = rsvpService.createRsvp(rsvp);
-
-                String message = isExisting ? "%s >>> %s is updated".formatted(newRsvp.getId(), newRsvp.getName())
-                                : "%s >>> %s is inserted".formatted(newRsvp.getId(), newRsvp.getName());
-
-                return ResponseEntity
-                                .status(HttpStatus.CREATED)
+        @GetMapping(path = "/rsvps/count")
+        public ResponseEntity<String> getTotalRsvpCount() {
+                Long count = rsvpService.getRsvpCount();
+                return ResponseEntity.status(HttpStatus.CREATED)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .body(Json.createObjectBuilder()
-                                                .add("Message", message)
-                                                .build()
-                                                .toString());
+                                                .add("Total Rsvp Count:", count)
+                                                .build().toString());
         }
 
 }
