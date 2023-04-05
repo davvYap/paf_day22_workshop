@@ -92,20 +92,22 @@ public class RSVPRepository {
         return rsvp;
     }
 
-    public RSVP updateRsvp(RSVP rsvp) {
-        RSVP newRsvp = getRSVPByEmail(rsvp.getEmail());
+    public RSVP updateRsvp(RSVP rsvp, String email) {
+        RSVP newRsvp = getRSVPByEmail(email);
         if (newRsvp != null) {
             newRsvp.setName(rsvp.getName());
             newRsvp.setPhone(rsvp.getPhone());
             newRsvp.setConfirmationDate(rsvp.getConfirmationDate());
             newRsvp.setComments(rsvp.getComments());
+            newRsvp.setEmail(rsvp.getEmail());
 
             jdbcTemplate.update(UPDATE_EXISTING_RSVP,
                     newRsvp.getName(),
                     newRsvp.getPhone(),
                     new Timestamp(rsvp.getConfirmationDate().toDateTime().getMillis()),
                     newRsvp.getComments(),
-                    newRsvp.getEmail());
+                    newRsvp.getEmail(),
+                    email);
         }
         return newRsvp;
     }

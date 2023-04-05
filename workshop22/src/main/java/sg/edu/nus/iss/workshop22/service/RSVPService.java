@@ -31,8 +31,8 @@ public class RSVPService {
         return rsvpRepository.createRsvp(rsvp);
     }
 
-    public RSVP updateRsvp(RSVP updateRsvp) {
-        RSVP rsvp = rsvpRepository.updateRsvp(updateRsvp);
+    public RSVP updateRsvp(RSVP updateRsvp, String email) {
+        RSVP rsvp = rsvpRepository.updateRsvp(updateRsvp, email);
         return rsvp;
     }
 

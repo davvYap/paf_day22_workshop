@@ -133,7 +133,7 @@ public class RSVPRestController {
                 }
 
                 // update record
-                RSVP updatedRsvp = rsvpService.updateRsvp(rsvp);
+                RSVP updatedRsvp = rsvpService.updateRsvp(rsvp, email);
                 return ResponseEntity
                                 .status(HttpStatus.CREATED)
                                 .contentType(MediaType.APPLICATION_JSON)
