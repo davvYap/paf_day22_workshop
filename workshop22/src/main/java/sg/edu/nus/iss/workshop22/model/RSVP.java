@@ -133,4 +133,10 @@ public class RSVP {
         return dateTime;
     }
 
+    public static DateTime getDateTimeFromHtmlForm(String date) {
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd");
+        DateTime dateTime = formatter.parseDateTime(date);
+        return dateTime;
+    }
+
 }

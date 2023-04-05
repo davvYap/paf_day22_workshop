@@ -27,116 +27,120 @@ import sg.edu.nus.iss.workshop22.service.RSVPService;
 @RequestMapping(path = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
 public class RSVPRestController {
 
-    @Autowired
-    RSVPService rsvpService;
+        @Autowired
+        RSVPService rsvpService;
 
-    @GetMapping(path = "/rsvps")
-    public ResponseEntity<String> getAllRSVPs() {
-        List<RSVP> rsvps = rsvpService.getAllRSVP();
-        JsonArrayBuilder rsvpArrBuilder = Json.createArrayBuilder();
-        for (RSVP rsvp : rsvps) {
-            rsvpArrBuilder.add(rsvp.toJSON());
-        }
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(rsvpArrBuilder.build().toString());
-    }
-
-    @GetMapping(path = "/rsvp")
-    public ResponseEntity<String> getRSVPByName(@RequestParam(required = true) String q) {
-
-        List<RSVP> rsvps = rsvpService.getAllRSVPFromName(q);
-
-        JsonArrayBuilder jsArrBuilder = Json.createArrayBuilder();
-        for (RSVP rsvp : rsvps) {
-            System.out.println(rsvp.toString());
-            jsArrBuilder.add(rsvp.toJSON());
+        @GetMapping(path = "/rsvps")
+        public ResponseEntity<String> getAllRSVPs() {
+                List<RSVP> rsvps = rsvpService.getAllRSVP();
+                JsonArrayBuilder rsvpArrBuilder = Json.createArrayBuilder();
+                for (RSVP rsvp : rsvps) {
+                        rsvpArrBuilder.add(rsvp.toJSON());
+                }
+                return ResponseEntity
+                                .status(HttpStatus.OK)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(rsvpArrBuilder.build().toString());
         }
 
-        JsonArray jsArr = jsArrBuilder.build();
+        @GetMapping(path = "/rsvp")
+        public ResponseEntity<String> getRSVPByName(@RequestParam(required = true) String q) {
 
-        if (rsvps.isEmpty()) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(Json.createObjectBuilder()
-                            .add("Error Message", "Name not found in database.")
-                            .build().toString());
+                List<RSVP> rsvps = rsvpService.getAllRSVPFromName(q);
+
+                JsonArrayBuilder jsArrBuilder = Json.createArrayBuilder();
+                for (RSVP rsvp : rsvps) {
+                        System.out.println(rsvp.toString());
+                        jsArrBuilder.add(rsvp.toJSON());
+                }
+
+                JsonArray jsArr = jsArrBuilder.build();
+
+                if (rsvps.isEmpty()) {
+                        return ResponseEntity
+                                        .status(HttpStatus.NOT_FOUND)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .body(Json.createObjectBuilder()
+                                                        .add("Error Message", "Name not found in database.")
+                                                        .build().toString());
+                }
+
+                return ResponseEntity
+                                .status(HttpStatus.OK)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(jsArr.toString());
         }
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(jsArr.toString());
-    }
+        // passing json to manipulate database data
+        @PostMapping(path = "/rsvp", consumes = MediaType.APPLICATION_JSON_VALUE)
+        public ResponseEntity<String> insertOrUpdateRsvpJSON(@RequestBody String json) throws IOException {
+                RSVP rsvp = RSVP.createFromJSON(json);
 
-    // passing json to manipulate database data
-    @PostMapping(path = "/rsvp", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> insertOrUpdateRsvpJSON(@RequestBody String json) throws IOException {
-        RSVP rsvp = RSVP.createFromJSON(json);
+                // to check whether is existing record
+                Boolean isExisting = rsvpService.getRSVPByEmail(rsvp.getEmail()) == null ? false : true;
+                System.out.println("isExisting >>>>> " + isExisting);
 
-        // to check whether is existing record
-        Boolean isExisting = rsvpService.getRSVPByEmail(rsvp.getEmail()) == null ? false : true;
-        System.out.println("isExisting >>>>> " + isExisting);
+                RSVP newRsvp = rsvpService.createRsvp(rsvp);
 
-        RSVP newRsvp = rsvpService.createRsvp(rsvp);
+                String message = isExisting ? "%s >>> %s is updated".formatted(newRsvp.getId(), newRsvp.getName())
+                                : "%s >>> %s is inserted".formatted(newRsvp.getId(), newRsvp.getName());
+                System.out.println(message);
 
-        String message = isExisting ? "%s >>> %s is updated".formatted(newRsvp.getId(), newRsvp.getName())
-                : "%s >>> %s is inserted".formatted(newRsvp.getId(), newRsvp.getName());
-        System.out.println(message);
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(Json.createObjectBuilder()
-                        .add("Message", message)
-                        .build()
-                        .toString());
-    }
-
-    @PutMapping(path = "/rsvp/{email}")
-    public ResponseEntity<String> updateRsvpJSON(@PathVariable String email, @RequestBody String json)
-            throws IOException {
-        RSVP rsvp = RSVP.createFromJSON(json);
-        RSVP existingRsvp = rsvpService.getRSVPByEmail(email);
-
-        if (existingRsvp == null) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(Json.createObjectBuilder()
-                            .add("Error message", "Rsvp with %s not found".formatted(email))
-                            .build().toString());
+                return ResponseEntity
+                                .status(HttpStatus.CREATED)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(Json.createObjectBuilder()
+                                                .add("Message", message)
+                                                .build()
+                                                .toString());
         }
 
-        // update record
-        RSVP updatedRsvp = rsvpService.updateRsvp(rsvp);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(Json.createObjectBuilder()
-                        .add("Message", "Rsvp with %s was updated".formatted(updatedRsvp.getEmail()))
-                        .build().toString());
-    }
+        @PutMapping(path = "/rsvp/{email}")
+        public ResponseEntity<String> updateRsvpJSON(@PathVariable String email, @RequestBody String json)
+                        throws IOException {
+                RSVP rsvp = RSVP.createFromJSON(json);
+                RSVP existingRsvp = rsvpService.getRSVPByEmail(email);
 
-    // passing data using a form
-    @PostMapping(path = "/rsvp/form", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public ResponseEntity<String> insertOrUpdateRsvpForm(@ModelAttribute RSVP rsvp) {
-        // to check whether is existing record
-        Boolean isExisting = rsvpService.getRSVPByEmail(rsvp.getEmail()) == null ? false : true;
-        RSVP newRsvp = rsvpService.createRsvp(rsvp);
+                if (existingRsvp == null) {
+                        return ResponseEntity
+                                        .status(HttpStatus.NOT_FOUND)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .body(Json.createObjectBuilder()
+                                                        .add("Error message", "Rsvp with %s not found".formatted(email))
+                                                        .build().toString());
+                }
 
-        String message = isExisting ? "%s >>> %s is updated".formatted(newRsvp.getId(), newRsvp.getName())
-                : "%s >>> %s is inserted".formatted(newRsvp.getId(), newRsvp.getName());
+                // update record
+                RSVP updatedRsvp = rsvpService.updateRsvp(rsvp);
+                return ResponseEntity
+                                .status(HttpStatus.CREATED)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(Json.createObjectBuilder()
+                                                .add("Message", "Rsvp with %s was updated"
+                                                                .formatted(updatedRsvp.getEmail()))
+                                                .build().toString());
+        }
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(Json.createObjectBuilder()
-                        .add("Message", message)
-                        .build()
-                        .toString());
-    }
+        // passing data using a form
+        @PostMapping(path = "/rsvp/form", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+        public ResponseEntity<String> insertOrUpdateRsvpForm(@ModelAttribute RSVP rsvp, @RequestParam String date) {
+                // to check whether is existing record
+                Boolean isExisting = rsvpService.getRSVPByEmail(rsvp.getEmail()) == null ? false : true;
+
+                System.out.println("Date from form >>>>>>>>>>>>>>>>>>>>>>>>>>> " + date);
+                rsvp.setConfirmationDate(RSVP.getDateTimeFromHtmlForm(date));
+                RSVP newRsvp = rsvpService.createRsvp(rsvp);
+
+                String message = isExisting ? "%s >>> %s is updated".formatted(newRsvp.getId(), newRsvp.getName())
+                                : "%s >>> %s is inserted".formatted(newRsvp.getId(), newRsvp.getName());
+
+                return ResponseEntity
+                                .status(HttpStatus.CREATED)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(Json.createObjectBuilder()
+                                                .add("Message", message)
+                                                .build()
+                                                .toString());
+        }
 
 }
